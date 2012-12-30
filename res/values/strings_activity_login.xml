@@ -1,0 +1,16 @@
+<resources>
+
+    <!-- Strings related to login -->
+    <string name="prompt_phone_number">Phone Number</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_log_in_short">Log in</string>
+    <string name="login_progress_logging_in">Logging in&#8230;</string>
+    <string name="error_invalid_phone_number">This phone number is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="action_log_in">Log In</string>
+    <string name="forgot_your_password"><a href="https://www.fido.ca/web/Fido.portal?_nfpb=true&amp;_pageLabel=Ecare_ForgotPassword">Forgot your password?</a></string>
+    <string name="login_url">https://www.fido.ca:443/web/Fido.portal?_nfpb=true&amp;_windowLabel=FidoSignIn_1_1&amp;FidoSignIn_1_1_actionOverride=%2Fcom%2Ffido%2Fportlets%2Fecare%2Faccount%2Fsignin%2FsignIn</string>
+
+</resources>
