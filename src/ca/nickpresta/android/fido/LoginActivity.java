@@ -35,8 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * Activity which displays a login screen to the user, offering registration as
- * well.
+ * Activity which displays a login screen to the user.
  */
 public class LoginActivity extends Activity {
 	private static final String TAG = "LoginActivity";
@@ -46,7 +45,7 @@ public class LoginActivity extends Activity {
      */
     private UserLoginTask mAuthTask = null;
 
-    // Values for email and password at the time of the login attempt.
+    // Values for phone number and password at the time of the login attempt.
     private String mPhoneNumber;
     private String mPassword;
 
