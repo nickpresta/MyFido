@@ -1,3 +1,4 @@
+
 package ca.nickpresta.android.fido;
 
 import java.io.IOException;
@@ -26,7 +27,6 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -38,8 +38,8 @@ import android.widget.Toast;
  * Activity which displays a login screen to the user.
  */
 public class LoginActivity extends Activity {
-	private static final String TAG = "LoginActivity";
-	
+    private static final String TAG = "LoginActivity";
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -62,22 +62,24 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_login);
-        
+
         mPhoneNumberView = (EditText) findViewById(R.id.phoneNumber);
 
         // Set up the login form.
         mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-        
+        mPasswordView
+                .setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView textView, int id,
+                            KeyEvent keyEvent) {
+                        if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                            attemptLogin();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
         mForgotPasswordView = (TextView) findViewById(R.id.forgot_password);
         mForgotPasswordView.setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -85,18 +87,19 @@ public class LoginActivity extends Activity {
         mLoginStatusView = findViewById(R.id.login_status);
         mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
 
-        findViewById(R.id.log_in_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+        findViewById(R.id.log_in_button).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        attemptLogin();
+                    }
+                });
     }
 
     /**
-     * Attempts to log in the account specified by the login form.
-     * If there are form errors (invalid phone number, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
+     * Attempts to log in the account specified by the login form. If there are
+     * form errors (invalid phone number, missing fields, etc.), the errors are
+     * presented and no actual login attempt is made.
      */
     public void attemptLogin() {
         if (mAuthTask != null) {
@@ -117,7 +120,7 @@ public class LoginActivity extends Activity {
 
         // Check for a valid password.
         if (TextUtils.isEmpty(mPassword)) {
-        	errorString = getString(R.string.error_field_required);
+            errorString = getString(R.string.error_field_required);
             focusView = mPasswordView;
             error = true;
         } else if (mPassword.length() < 1) {
@@ -157,73 +160,75 @@ public class LoginActivity extends Activity {
      * Shows the progress UI and hides the login form.
      */
     private void showProgress(final boolean show) {
-		int shortAnimTime = getResources().getInteger(
-				android.R.integer.config_shortAnimTime);
+        int shortAnimTime = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
 
-		mLoginStatusView.setVisibility(View.VISIBLE);
-		mLoginStatusView.animate().setDuration(shortAnimTime)
-				.alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-					@Override
-					public void onAnimationEnd(Animator animation) {
-						mLoginStatusView.setVisibility(show ? View.VISIBLE
-								: View.GONE);
-					}
-				});
+        mLoginStatusView.setVisibility(View.VISIBLE);
+        mLoginStatusView.animate().setDuration(shortAnimTime)
+                .alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mLoginStatusView.setVisibility(show ? View.VISIBLE
+                                : View.GONE);
+                    }
+                });
 
-		mLoginFormView.setVisibility(View.VISIBLE);
-		mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1)
-				.setListener(new AnimatorListenerAdapter() {
-					@Override
-					public void onAnimationEnd(Animator animation) {
-						mLoginFormView.setVisibility(show ? View.GONE
-								: View.VISIBLE);
-					}
-				});
+        mLoginFormView.setVisibility(View.VISIBLE);
+        mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mLoginFormView.setVisibility(show ? View.GONE
+                                : View.VISIBLE);
+                    }
+                });
     }
 
     /**
-     * Represents an asynchronous login task used to authenticate
-     * the user.
+     * Represents an asynchronous login task used to authenticate the user.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... params) {
-        	DefaultHttpClient client = new DefaultHttpClient();
-        	// Create a local instance of cookie store
+            DefaultHttpClient client = new DefaultHttpClient();
+            // Create a local instance of cookie store
             BasicCookieStore cookieStore = new BasicCookieStore();
             // Create local HTTP context
             HttpContext localContext = new BasicHttpContext();
             // Bind custom cookie store to the local context
             localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-            
+
             HttpPost httpPost = new HttpPost(getString(R.string.login_url));
-            
+
             List<NameValuePair> postData = new ArrayList<NameValuePair>(2);
-            postData.add(new BasicNameValuePair("FidoSignIn_1_1{actionForm.fidonumber}", mPhoneNumber));
-            postData.add(new BasicNameValuePair("FidoSignIn_1_1{actionForm.password}", mPassword));
-            postData.add(new BasicNameValuePair("FidoSignIn_1_1{actionForm.loginAsGAM}", "false"));
-            
+            postData.add(new BasicNameValuePair(
+                    "FidoSignIn_1_1{actionForm.fidonumber}", mPhoneNumber));
+            postData.add(new BasicNameValuePair(
+                    "FidoSignIn_1_1{actionForm.password}", mPassword));
+            postData.add(new BasicNameValuePair(
+                    "FidoSignIn_1_1{actionForm.loginAsGAM}", "false"));
+
             try {
-            	httpPost.setEntity(new UrlEncodedFormEntity(postData));
-				HttpResponse response = client.execute(httpPost, localContext);
-				
-				if (response.getStatusLine().getStatusCode() != 200) {
-					return false;
-				}
-				
-				for (Cookie cookie : cookieStore.getCookies()) {
-					if (cookie.getName().equals("lithiumSSO:fido")) {
-						return true;
-					}
-				}				
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            
+                httpPost.setEntity(new UrlEncodedFormEntity(postData));
+                HttpResponse response = client.execute(httpPost, localContext);
+
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    return false;
+                }
+
+                for (Cookie cookie : cookieStore.getCookies()) {
+                    if (cookie.getName().equals("lithiumSSO:fido")) {
+                        return true;
+                    }
+                }
+            } catch (ClientProtocolException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
             return false;
         }
 
@@ -233,13 +238,16 @@ public class LoginActivity extends Activity {
             showProgress(false);
 
             if (success) {
-            	InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            	imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-            	Toast.makeText(getApplicationContext(), "Logged in successfully!", Toast.LENGTH_LONG).show();
-                //finish();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                        0);
+                Toast.makeText(getApplicationContext(),
+                        "Logged in successfully!", Toast.LENGTH_LONG).show();
+                // finish();
             } else {
-            	mPasswordView.requestFocus();
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.requestFocus();
+                mPasswordView
+                        .setError(getString(R.string.error_incorrect_password));
             }
         }
 
