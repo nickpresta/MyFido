@@ -20,19 +20,21 @@ import org.apache.http.protocol.HttpContext;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
-import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Activity which displays a login screen to the user.
@@ -48,13 +50,14 @@ public class LoginActivity extends Activity {
     // Values for phone number and password at the time of the login attempt.
     private String mPhoneNumber;
     private String mPassword;
+    private Boolean mRememberCredentials;
 
     // UI references.
     private EditText mPhoneNumberView;
     private EditText mPasswordView;
+    private CheckBox mRememberCredentialsView;
     private View mLoginFormView;
     private View mLoginStatusView;
-    private TextView mLoginStatusMessageView;
     private TextView mForgotPasswordView;
 
     @Override
@@ -62,7 +65,8 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_login);
-
+        
+        mRememberCredentialsView = (CheckBox) findViewById(R.id.remember_me);
         mPhoneNumberView = (EditText) findViewById(R.id.phoneNumber);
 
         // Set up the login form.
@@ -85,7 +89,6 @@ public class LoginActivity extends Activity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mLoginStatusView = findViewById(R.id.login_status);
-        mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
 
         findViewById(R.id.log_in_button).setOnClickListener(
                 new View.OnClickListener() {
@@ -94,6 +97,17 @@ public class LoginActivity extends Activity {
                         attemptLogin();
                     }
                 });
+        
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String phoneNumber = prefs.getString("phoneNumber", "");
+        String password = prefs.getString("password", "");
+        if (!phoneNumber.isEmpty() && !password.isEmpty()) {
+            mPhoneNumberView.setText(phoneNumber);
+            mPasswordView.setText(password);
+            attemptLogin();
+        } else {
+            mRememberCredentialsView.setChecked(false);
+        }
     }
 
     /**
@@ -105,7 +119,7 @@ public class LoginActivity extends Activity {
         if (mAuthTask != null) {
             return;
         }
-
+        
         // Reset errors.
         mPhoneNumberView.setError(null);
         mPasswordView.setError(null);
@@ -113,6 +127,18 @@ public class LoginActivity extends Activity {
         // Store values at the time of the login attempt.
         mPhoneNumber = mPhoneNumberView.getText().toString();
         mPassword = mPasswordView.getText().toString();
+        mRememberCredentials = mRememberCredentialsView.isChecked();
+        
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        if (mRememberCredentials) {
+            editor.putString("phoneNumber", mPhoneNumber);
+            editor.putString("password", mPassword);
+        } else {
+            editor.remove("phoneNumber");
+            editor.remove("password");
+        }
+        editor.commit();
 
         boolean error = false;
         String errorString = null;
@@ -149,7 +175,6 @@ public class LoginActivity extends Activity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            mLoginStatusMessageView.setText(R.string.login_progress_logging_in);
             showProgress(true);
             mAuthTask = new UserLoginTask();
             mAuthTask.execute((Void) null);
@@ -160,6 +185,7 @@ public class LoginActivity extends Activity {
      * Shows the progress UI and hides the login form.
      */
     private void showProgress(final boolean show) {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         int shortAnimTime = getResources().getInteger(
                 android.R.integer.config_shortAnimTime);
 
@@ -238,12 +264,10 @@ public class LoginActivity extends Activity {
             showProgress(false);
 
             if (success) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                        0);
-                Toast.makeText(getApplicationContext(),
-                        "Logged in successfully!", Toast.LENGTH_LONG).show();
-                // finish();
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+                Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(mainIntent);
             } else {
                 mPasswordView.requestFocus();
                 mPasswordView
